@@ -18,7 +18,7 @@ template<typename T> inline T* nonNull(T* const p)
 	return p;
 }
 
-[[noreturn]] static inline void panic(char const* const file, int const line, char const* const msg)
+ __attribute((noreturn)) static inline void panic(char const* const file, int const line, char const* const msg)
 {
 	fprintf(stderr, "%s:%d: %s\n", file, line, msg);
 	abort();
