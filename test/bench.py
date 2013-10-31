@@ -13,17 +13,27 @@ class Options:
 	"""Stores options for the tests"""
 	srcfile = ""
 	result = ""
-	executable = "c4"
+	executable = "../build/c4"
+	
+	def __init__(self, s, r, e):
+		srcfile = s
+		result=r
+		executable=e
+
+def prepared():
+	gEx = "../build/c4"
+
+	invoke(Options("lexer/keywords_input.c","keywords_input.tok",gEx))
 
 def main():
 	# get cmd file
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "hf:r:e:", ["help", "src", "result", "executable"])
+		opts, args = getopt.getopt(sys.argv[1:], "hf:r:e:p", ["help", "src", "result", "executable", "prepared"])
 	except getopt.error, msg:
 		print msg
 		sys.exit(2)
 	# handle options
-	options = Options()
+	options = Options("", "", "")
 	for o, a in opts:
 		if o in ("-h", "--help"):
 			print __doc__
@@ -34,6 +44,9 @@ def main():
 			options.result = a
 		if o in ("-e", "--executable"):
 			options.executable = a
+		if o in ("-p", "--prepared"):
+			prepared()
+			sys.exit(0)
 	invoke(options)
 
 def invoke(options):
