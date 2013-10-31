@@ -42,3 +42,6 @@ _Imaginary
 _Noreturn
 _Static_assert
 _Thread_local
+
+autobreak
+char const
