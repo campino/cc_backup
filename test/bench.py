@@ -13,7 +13,7 @@ class Options:
 	"""Stores options for the tests"""
 	srcfile = ""
 	result = ""
-	executable = "../build/c4"
+	executable = "../build/default/c4"
 	
 	def __init__(self, s, r, e):
 		srcfile = s
@@ -21,7 +21,7 @@ class Options:
 		executable=e
 
 def prepared():
-	gEx = "../build/c4"
+	gEx = "../build/default/c4"
 
 	invoke(Options("lexer/keywords_input.c","keywords_input.tok",gEx))
 
