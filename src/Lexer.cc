@@ -135,6 +135,19 @@ Token *Lexer::next() {
 	}
 	lastPos = clone(current);
 
+	// character constant
+	if('\''==c) {
+		char n1 = get_char();
+		char n2 = get_char();
+		if('\''==n2) {
+			return new Token(lastPos, new char[4]{c, n1, n2, 0}, TokenType::CONSTANT);
+		} else {
+			errorf(*current, "This compiler does not support char sequences.");
+			unget_char(n2);
+			return new Token(lastPos, new char[4]{c, n1, '\'', 0}, TokenType::CONSTANT);
+		}
+	}
+
 	// digit
 	if(isDigit(c) || c=='.') {
 		return digit(c);
@@ -170,6 +183,10 @@ Token *Lexer::string_literal(char c) {
 		}
 		all.push_back(c);
 	} while(goOn && !feof(input));
+
+	if(goOn && feof(input)) {
+		errorf(*current, "Non-terminated string!");
+	}
 
 	char *text = new char[all.length()+1];
 	strncpy(text, all.c_str(), all.length()+1);
