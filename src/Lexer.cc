@@ -14,6 +14,4 @@ void Token::print(FILE *stream) {
 };
 
 Lexer::~Lexer() {
-	// TODO Auto-generated destructor stub
 }
-
