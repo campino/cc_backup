@@ -20,11 +20,60 @@
 using namespace std;
 
 enum TokenType {
-	KEYWORD = 0, IDENTIFIER = 1, CONSTANT = 2, STRING = 3, PUNCTUATOR = 4, END = 5,
+	KEYWORD = 0,
+	IDENTIFIER = 1,
+	CONSTANT = 2,
+	STRING = 3,
+	PUNCTUATOR = 4,
+	END = 5,
 };
 
 static char const* const types[6] = { "keyword", "identifier", "constant",
 		"string", "punctuator", "EOF" };
+
+static string keywords[44] = {"auto", "break",
+	"case",
+	"char",
+	"const",
+	"continue",
+	"default",
+	"do",
+	"double",
+	"else",
+	"enum",
+	"extern",
+	"float",
+	"for",
+	"goto",
+	"if",
+	"inline",
+	"int",
+	"long",
+	"register",
+	"restrict",
+	"return",
+	"short",
+	"signed",
+	"sizeof",
+	"static",
+	"struct",
+	"switch",
+	"typedef",
+	"union",
+	"unsigned",
+	"void",
+	"volatile",
+	"while",
+	"_Alignas",
+	"_Alignof",
+	"_Atomic",
+	"_Bool",
+	"_Complex",
+	"_Generic",
+	"_Imaginary",
+	"_Noreturn",
+	"_Static_assert",
+	"_Thread_local"};
 
 class Token {
 public:
@@ -33,7 +82,6 @@ public:
 	}
 	;
 	void print(FILE *stream);
-private:
 	char const* const text;
 	Pos * const pos;
 	TokenType const type;
@@ -56,26 +104,29 @@ private:
 	Pos *current;
 	Token *next();
 	Token *digit(char c);
-	Token *exponentPart(string);
+	Token *identifier(char c);
+	Token *exponentPart(string, char);
+	Token *punctuator(char);
+	Token *string_literal(char);
 	char get_char();
 	void unget_char(char c);
 
 	inline Token *makePunc(char c) {
-		return new Token(lastToken, new char[1] { c }, TokenType::PUNCTUATOR);
+		return new Token(lastToken, new char[2] { c, 0 }, TokenType::PUNCTUATOR);
 	}
 
 	inline Token *makePunc(char c, char c1) {
-		return new Token(lastToken, new char[2] { c, c1 },
+		return new Token(lastToken, new char[3] { c, c1, 0 },
 				TokenType::PUNCTUATOR);
 	}
 
 	inline Token *makePunc(char c, char c1, char c2) {
-		return new Token(lastToken, new char[3] { c, c1, c2 },
+		return new Token(lastToken, new char[4] { c, c1, c2, 0 },
 				TokenType::PUNCTUATOR);
 	}
 
 	inline Token *makePunc(char c, char c1, char c2, char c3) {
-		return new Token(lastToken, new char[4] { c, c1, c2, c3 },
+		return new Token(lastToken, new char[5] { c, c1, c2, c3, 0 },
 				TokenType::PUNCTUATOR);
 	}
 };

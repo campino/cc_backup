@@ -67,7 +67,10 @@ int main(int, char** const argv)
 
 					std::list<Token*>::iterator it = list->begin();
 					while(it!=list->end()) {
-						((Token*)*it)->print(stdout);
+						Token* tok = (Token*) (*it);
+						if(TokenType::END!=tok->type) {
+							tok->print(stdout);
+						}
 						it++;
 					}
 					break;
