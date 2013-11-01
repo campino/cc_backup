@@ -93,14 +93,14 @@ public:
 			input(in) {
 		current = new Pos(name);
 		current->line = 1;
-		lastToken = current;
+		lastPos = current;
 	}
 	;
 	~Lexer();
 	list<Token*> *lex();
 private:
 	FILE *input;
-	Pos *lastToken;
+	Pos *lastPos;
 	Pos *current;
 	Token *next();
 	Token *digit(char c);
@@ -110,23 +110,24 @@ private:
 	Token *string_literal(char);
 	char get_char();
 	void unget_char(char c);
+	int last_line_length = 0;
 
 	inline Token *makePunc(char c) {
-		return new Token(lastToken, new char[2] { c, 0 }, TokenType::PUNCTUATOR);
+		return new Token(lastPos, new char[2] { c, 0 }, TokenType::PUNCTUATOR);
 	}
 
 	inline Token *makePunc(char c, char c1) {
-		return new Token(lastToken, new char[3] { c, c1, 0 },
+		return new Token(lastPos, new char[3] { c, c1, 0 },
 				TokenType::PUNCTUATOR);
 	}
 
 	inline Token *makePunc(char c, char c1, char c2) {
-		return new Token(lastToken, new char[4] { c, c1, c2, 0 },
+		return new Token(lastPos, new char[4] { c, c1, c2, 0 },
 				TokenType::PUNCTUATOR);
 	}
 
 	inline Token *makePunc(char c, char c1, char c2, char c3) {
-		return new Token(lastToken, new char[5] { c, c1, c2, c3, 0 },
+		return new Token(lastPos, new char[5] { c, c1, c2, c3, 0 },
 				TokenType::PUNCTUATOR);
 	}
 };

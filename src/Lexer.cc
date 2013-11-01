@@ -34,11 +34,12 @@ Lexer::~Lexer() {
 }
 
 void Lexer::unget_char(char ch) {
-	if('\n'==ch) {
-		return;
-	}
 	ungetc(ch, input);
 	current->column--;
+	if('\n'==ch) {
+		current->line--;
+		current->column = last_line_length;
+	}
 }
 
 char Lexer::get_char() {
@@ -48,8 +49,9 @@ char Lexer::get_char() {
 	char c = fgetc(input);
 
 	if('\n'==c) {
+		last_line_length = current->column;
 		current->line++;
-		current->column=1;
+		current->column=0;
 	} else {
 		current->column++;
 	}
@@ -63,7 +65,7 @@ Token *Lexer::exponentPart(string all, char e) {
 		unget_char(e);
 		char *text = new char[all.length()+1];
 		strncpy(text, all.c_str(), all.length()+1);
-		return new Token(lastToken, text, TokenType::CONSTANT);
+		return new Token(lastPos, text, TokenType::CONSTANT);
 	}
 	all.push_back(e);
 	all.push_back(c);
@@ -85,7 +87,7 @@ Token *Lexer::exponentPart(string all, char e) {
 
 	char *text = new char[all.length()+1];
 	strncpy(text, all.c_str(), all.length()+1);
-	return new Token(lastToken, text, TokenType::CONSTANT);
+	return new Token(lastPos, text, TokenType::CONSTANT);
 }
 
 Token *Lexer::digit(char c) {
@@ -123,7 +125,7 @@ Token *Lexer::digit(char c) {
 
 	char *text = new char[all.length()+1];
 	strncpy(text, all.c_str(), all.length()+1);
-	return new Token(lastToken, text, TokenType::CONSTANT);
+	return new Token(lastPos, text, TokenType::CONSTANT);
 };
 
 Token *Lexer::next() {
@@ -131,7 +133,7 @@ Token *Lexer::next() {
 	while(' '==c||'\n'==c||'\t'==c) {
 		c = get_char();
 	}
-	lastToken = clone(current);
+	lastPos = clone(current);
 
 	// digit
 	if(isDigit(c) || c=='.') {
@@ -171,7 +173,7 @@ Token *Lexer::string_literal(char c) {
 
 	char *text = new char[all.length()+1];
 	strncpy(text, all.c_str(), all.length()+1);
-	return new Token(lastToken, text, TokenType::STRING);
+	return new Token(lastPos, text, TokenType::STRING);
 }
 
 Token *Lexer::identifier(char c) {
@@ -197,7 +199,7 @@ Token *Lexer::identifier(char c) {
 
 	char *text = new char[all.length()+1];
 	strncpy(text, all.c_str(), all.length()+1);
-	return new Token(lastToken, text, tt);
+	return new Token(lastPos, text, tt);
 }
 
 Token *Lexer::punctuator(char c) {

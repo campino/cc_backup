@@ -11,7 +11,7 @@ SRC    := $(sort $(wildcard $(SRCDIR)/*.cc))
 OBJ    := $(SRC:$(SRCDIR)/%.cc=$(BINDIR)/%.o)
 DEP    := $(OBJ:%.o=%.d)
 
-CFLAGS   += -Wall -W -Werror
+CFLAGS   += -Wall -W -Werror -g
 CXXFLAGS += $(CFLAGS) -std=c++11
 
 DUMMY := $(shell mkdir -p $(sort $(dir $(OBJ))))
