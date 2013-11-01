@@ -1,7 +1,12 @@
 #include <stdexcept>
+#include <list>
 
 #include "diagnostic.h"
 #include "util.h"
+
+#include "Lexer.h"
+
+using namespace std;
 
 enum class Mode {
 	TOKENIZE,
@@ -56,7 +61,17 @@ int main(int, char** const argv)
 					continue;
 
 				switch (mode) {
-				case Mode::TOKENIZE:
+				case Mode::TOKENIZE: {
+					Lexer lexer(f, name);
+					list<Token*> *list = lexer.lex();
+
+					std::list<Token*>::iterator it = list->begin();
+					while(it!=list->end()) {
+						((Token*)*it)->print(stdout);
+						it++;
+					}
+					break;
+				}
 				case Mode::PARSE:
 				case Mode::PRINT_AST:
 				case Mode::COMPILE:

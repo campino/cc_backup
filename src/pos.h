@@ -16,4 +16,6 @@ struct Pos
 	unsigned    column;
 };
 
+Pos *clone(Pos *pos);
+
 #endif
