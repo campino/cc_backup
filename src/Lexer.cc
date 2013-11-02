@@ -178,6 +178,8 @@ Token *Lexer::string_literal(char c) {
 			escape = true;
 		} else if('"'==c && !escape) {
 			goOn=false;
+		} else if ('\n'==c) {
+			errorf(*current, "New line characters are not permitted within string sequences.");
 		} else {
 			escape = false;
 		}
@@ -238,6 +240,18 @@ Token *Lexer::punctuator(char c) {
 		case '!':
 		case '^':
 		case '/':
+		{
+			char n = get_char();
+			if('/'==n) {
+				singleLineComment();
+				return NULL;
+			} else if('*'==n) {
+				multiLineComment();
+				return NULL;
+			} else {
+				unget_char(n);
+			}
+		}
 		case '*':
 		{
 			char n = get_char();
@@ -347,8 +361,27 @@ list<Token*> *Lexer::lex() {
 
 	while(!feof(input)) {
 		Token *tok = next();
-		result->push_back(tok);
+		if(NULL!=tok) {
+			result->push_back(tok);
+		}
 	}
 
 	return result;
+}
+
+void Lexer::multiLineComment() {
+	char c = get_char();
+	char c2 = get_char();
+
+	while(!('*'==c && '/'==c2)) {
+		c = c2;
+		c2 = get_char();
+	}
+}
+
+void Lexer::singleLineComment() {
+	char c = 0;
+		do {
+			c = get_char();
+		} while('\n'!=c);
 }

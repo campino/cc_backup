@@ -108,6 +108,8 @@ private:
 	Token *exponentPart(string, char);
 	Token *punctuator(char);
 	Token *string_literal(char);
+	void multiLineComment();
+	void singleLineComment();
 	char get_char();
 	void unget_char(char c);
 	int last_line_length = 0;

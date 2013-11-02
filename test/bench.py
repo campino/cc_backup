@@ -30,6 +30,8 @@ def prepared():
 	invoke(Options("lexer/", "constants_input.c","constants_input.tok",gEx))
 	invoke(Options("lexer/", "identifier_input.c","identifier_tokens.tok",gEx))
 	invoke(Options("lexer/", "punctator_input.c","punctator_input.tok",gEx))
+	invoke(Options("lexer/", "comments.c","comments.tok",gEx))
+	
 
 def main():
 	# get cmd file
