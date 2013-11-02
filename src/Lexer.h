@@ -29,7 +29,7 @@ enum TokenType {
 };
 
 static char const* const types[6] = { "keyword", "identifier", "constant",
-		"string", "punctuator", "EOF" };
+		"string-literal", "punctuator", "EOF" };
 
 static string keywords[44] = {"auto", "break",
 	"case",

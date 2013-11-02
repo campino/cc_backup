@@ -12,22 +12,24 @@ import shutil, shlex, re
 
 class Options:
 	"""Stores options for the tests"""
+	basedir = ""
 	srcfile = ""
 	result = ""
 	executable = "../build/default/c4"
 	
-	def __init__(self, s, r, e):
-		srcfile = s
-		result=r
-		executable=e
+	def __init__(self, base, s, r, e):
+		self.basedir = base
+		self.srcfile = s
+		self.result=r
+		self.executable=e
 
 def prepared():
 	gEx = "../build/default/c4"
 
-	#invoke(Options("lexer/keywords_input.c","keywords_input.tok",gEx))
-	invoke(Options("lexer/constants_input.c","constants_input.tok",gEx))
-	#invoke(Options("lexer/identifier_input.c","identifier_input.tok",gEx))
-	#invoke(Options("lexer/punctator_input.c","punctator_input.tok",gEx))
+	invoke(Options("lexer/", "keywords_input.c","keywords_tokens.tok",gEx))
+	invoke(Options("lexer/", "constants_input.c","constants_input.tok",gEx))
+	invoke(Options("lexer/", "identifier_input.c","identifier_tokens.tok",gEx))
+	invoke(Options("lexer/", "punctator_input.c","punctator_input.tok",gEx))
 
 def main():
 	# get cmd file
@@ -37,7 +39,7 @@ def main():
 		print msg
 		sys.exit(2)
 	# handle options
-	options = Options("", "", "")
+	options = Options("", "", "", "")
 	for o, a in opts:
 		if o in ("-h", "--help"):
 			print __doc__
@@ -55,18 +57,22 @@ def main():
 
 def invoke(options):
 	print "starting..."
-	execCmd = [options.executable, "--tokenize", options.srcfile]
-	result = subprocess.check_output(execCmd)
-	f = open(options.result, 'r')
-	fails = 0
-	for line in f:
-		if not result.startswith(line):
-			fails = fails + 1
-			print "Fail: expected: "+line+" but found: "+result[:result.find("\n")]
-		result = result[result.find("\n"):]
-	f.close()
-	print "done"
-	if 0!=fails:
-		print "There were failures!"
+	execCmd = [os.path.abspath(options.executable), "--tokenize", options.srcfile]
+	try:
+		result = subprocess.check_output(execCmd, cwd=options.basedir)
+		f = open(os.path.join(options.basedir, options.result), 'r')
+		fails = 0
+		for line in f:
+			if not result.startswith(line):
+				fails = fails + 1
+				print "Fail: expected: "+line+" but found: "+result[:result.find("\n")]
+			result = result[result.find("\n")+1:]
+		f.close()
+		print "done"
+		if 0!=fails:
+			print "There were failures!"
+	except subprocess.CalledProcessError, err:
+		print "The lexer failed: " + err.returncode + "."
+		print "It printed: "+err.output
 
 main()

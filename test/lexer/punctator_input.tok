@@ -52,5 +52,5 @@ punctator_input.c:10:7 punctuator <%
 punctator_input.c:10:10 punctuator %>
 punctator_input.c:10:13 punctuator %:
 punctator_input.c:10:16 punctuator %:%:
-punctator_input.c:10:1 punctuator %:
-punctator_input.c:10:3 punctuator %
+punctator_input.c:11:1 punctuator %:
+punctator_input.c:11:3 punctuator %
