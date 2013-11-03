@@ -110,6 +110,7 @@ private:
 	Token *string_literal(char);
 	void multiLineComment();
 	void singleLineComment();
+	void readEscapeSequence(string *all);
 	char get_char();
 	void unget_char(char c);
 	int last_line_length = 0;

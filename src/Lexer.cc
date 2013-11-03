@@ -15,6 +15,16 @@ inline bool isDigit(char c) {
 	return ('0'<=c && c<='9');
 }
 
+inline bool isOctalDigit(char c) {
+	return ('0'<=c && c<='7');
+}
+
+inline bool isHexadecimalDigit(char c) {
+	return ('0'<=c && c<='9')
+			|| ('a'<=c && c<='f')
+			|| ('A'<=c && c<='F');
+}
+
 inline bool isKeyword(string str) {
 	for(int i=0;i<44;i++) {
 		if(keywords[i]==str) {
@@ -171,19 +181,17 @@ Token *Lexer::string_literal(char c) {
 	all.push_back(c);
 
 	bool goOn = true;
-	bool escape = false;
 	do {
 		char c=get_char();
-		if('\\'==c) {
-			escape = true;
-		} else if('"'==c && !escape) {
+		if('"'==c) {
 			goOn=false;
 		} else if ('\n'==c) {
 			errorf(*current, "New line characters are not permitted within string sequences.");
-		} else {
-			escape = false;
 		}
 		all.push_back(c);
+		if('\\'==c) {
+			readEscapeSequence(&all);
+		}
 	} while(goOn && !feof(input));
 
 	if(goOn && feof(input)) {
@@ -193,6 +201,64 @@ Token *Lexer::string_literal(char c) {
 	char *text = new char[all.length()+1];
 	strncpy(text, all.c_str(), all.length()+1);
 	return new Token(lastPos, text, TokenType::STRING);
+}
+
+void Lexer::readEscapeSequence(string *all) {
+	// the \ is already read
+	// next character
+	char c = get_char();
+
+	// simple escape sequence
+	if('\''==c || '"'==c || '?'==c || '\\'==c
+			|| 'a'==c || 'b'==c || 'f'==c
+			|| 'n'==c || 'r'==c ||'t'==c
+			|| 'v'==c) {
+		all->push_back(c);
+		return;
+	}
+
+	// octal-escape-sequence
+	if(isOctalDigit(c)) {
+		all->push_back(c);
+		c = get_char();
+		if(isOctalDigit(c)) {
+			all->push_back(c);
+			c = get_char();
+			if(isOctalDigit(c)) {
+				all->push_back(c);
+				return;
+			} else {
+				unget_char(c);
+				return;
+			}
+		} else {
+			unget_char(c);
+			return;
+		}
+	}
+
+	// hexadecimal-escape-sequence
+	if('x'==c) {
+		all->push_back(c);
+		c=get_char();
+		if(isHexadecimalDigit(c)) {
+			all->push_back(c);
+			c = get_char();
+			if(isHexadecimalDigit(c)) {
+				all->push_back(c);
+				return;
+			} else {
+				unget_char(c);
+				return;
+			}
+		} else {
+			unget_char(c);
+			errorf(*current, "\\x is not a valid escape sequence. ");
+			return;
+		}
+	}
+
+	errorf(*current, "single \\ is illegal in a string constant. ");
 }
 
 Token *Lexer::identifier(char c) {

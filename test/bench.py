@@ -31,6 +31,7 @@ def prepared():
 	invoke(Options("lexer/", "identifier_input.c","identifier_tokens.tok",gEx))
 	invoke(Options("lexer/", "punctator_input.c","punctator_input.tok",gEx))
 	invoke(Options("lexer/", "comments.c","comments.tok",gEx))
+	invoke(Options("lexer/", "escape.c","escape.tok",gEx))
 	
 
 def main():
@@ -74,7 +75,7 @@ def invoke(options):
 		if 0!=fails:
 			print "There were failures!"
 	except subprocess.CalledProcessError, err:
-		print "The lexer failed: " + err.returncode + "."
+		print "The lexer failed: " + str(err.returncode) + "."
 		print "It printed: "+err.output
 
 main()
