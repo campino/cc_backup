@@ -24,9 +24,9 @@ class Options:
 def prepared():
 	gEx = "../build/default/c4"
 
-	#invoke(Options("lexer/keywords_input.c","keywords_input.tok",gEx))
+	#invoke(Options("lexer/keywords_input.c","keywords_tokens.tok",gEx))
 	invoke(Options("lexer/constants_input.c","constants_input.tok",gEx))
-	#invoke(Options("lexer/identifier_input.c","identifier_input.tok",gEx))
+	#invoke(Options("lexer/identifier_input.c","identifier_tokens.tok",gEx))
 	#invoke(Options("lexer/punctator_input.c","punctator_input.tok",gEx))
 
 def main():

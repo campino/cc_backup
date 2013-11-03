@@ -204,7 +204,7 @@ Token *Lexer::char_constant(char c) {
 		char c=get_char();
 		if (c=='\\'){
 			escape = true;
-		} else if(c=='\'' && !escape && (c!='\n')){
+		} else if(c=='\'' && !escape){
 			goOn = false;
 		} else {
 			escape = false;
@@ -369,7 +369,7 @@ Token *Lexer::punctuator(char c) {
 
 		//unknown char
 		errorf(*current, "Unknown Char in the input!");
-		return new Token(current, new char[2] {c,0} , TokenType::UNKNOWN);
+		return new Token(lastPos, new char[2] {c,0} , TokenType::UNKNOWN);
 }
 
 list<Token*> *Lexer::lex() {
