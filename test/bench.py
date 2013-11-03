@@ -32,7 +32,6 @@ def prepared():
 	invoke(Options("lexer/", "punctator_input.c","punctator_input.tok",gEx))
 	invoke(Options("lexer/", "comments.c","comments.tok",gEx))
 	invoke(Options("lexer/", "escape.c","escape.tok",gEx))
-	
 
 def main():
 	# get cmd file

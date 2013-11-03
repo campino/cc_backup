@@ -26,10 +26,11 @@ enum TokenType {
 	STRING = 3,
 	PUNCTUATOR = 4,
 	END = 5,
+	UNKNOWN = 6,
 };
 
-static char const* const types[6] = { "keyword", "identifier", "constant",
-		"string-literal", "punctuator", "EOF" };
+static char const* const types[7] = { "keyword", "identifier", "constant",
+		"string-literal", "punctuator", "EOF", "unknown" };
 
 static string keywords[44] = {"auto", "break",
 	"case",
@@ -111,6 +112,8 @@ private:
 	void multiLineComment();
 	void singleLineComment();
 	void readEscapeSequence(string *all);
+	void readCharSequence(string *all, char term, const char *error);
+	Token *char_constant(char);
 	char get_char();
 	void unget_char(char c);
 	int last_line_length = 0;

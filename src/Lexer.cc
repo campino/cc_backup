@@ -139,23 +139,23 @@ Token *Lexer::digit(char c) {
 };
 
 Token *Lexer::next() {
+
 	char c = get_char();
 	while(' '==c||'\n'==c||'\t'==c) {
 		c = get_char();
 	}
 	lastPos = clone(current);
+	
+
+	// EOF
+	if(feof(input)){
+		return new Token(current, "EOF", TokenType::END);
+	}
+
 
 	// character constant
 	if('\''==c) {
-		char n1 = get_char();
-		char n2 = get_char();
-		if('\''==n2) {
-			return new Token(lastPos, new char[4]{c, n1, n2, 0}, TokenType::CONSTANT);
-		} else {
-			errorf(*current, "This compiler does not support char sequences.");
-			unget_char(n2);
-			return new Token(lastPos, new char[4]{c, n1, '\'', 0}, TokenType::CONSTANT);
-		}
+		return char_constant(c);	
 	}
 
 	// digit
@@ -172,31 +172,36 @@ Token *Lexer::next() {
 		return string_literal(c);
 	}
 
-	// punctuator
+	// punctuator and unknown char
 	return punctuator(c);
+
+}
+
+void Lexer::readCharSequence(string *all, char term, const char *error) {
+	bool goOn = true;
+	do {
+		char c=get_char();
+		if(term==c) {
+			goOn=false;
+		} else if ('\n'==c) {
+			errorf(*current, "New line characters are not permitted within string sequences.");
+		}
+		all->push_back(c);
+		if('\\'==c) {
+			readEscapeSequence(all);
+		}
+	} while(goOn && !feof(input));
+
+	if(goOn && feof(input)) {
+		errorf(*current, error);
+	}
 }
 
 Token *Lexer::string_literal(char c) {
 	string all;
 	all.push_back(c);
 
-	bool goOn = true;
-	do {
-		char c=get_char();
-		if('"'==c) {
-			goOn=false;
-		} else if ('\n'==c) {
-			errorf(*current, "New line characters are not permitted within string sequences.");
-		}
-		all.push_back(c);
-		if('\\'==c) {
-			readEscapeSequence(&all);
-		}
-	} while(goOn && !feof(input));
-
-	if(goOn && feof(input)) {
-		errorf(*current, "Non-terminated string!");
-	}
+	readCharSequence(&all, '"', "Non-terminated string!");
 
 	char *text = new char[all.length()+1];
 	strncpy(text, all.c_str(), all.length()+1);
@@ -259,6 +264,17 @@ void Lexer::readEscapeSequence(string *all) {
 	}
 
 	errorf(*current, "single \\ is illegal in a string constant. ");
+}
+
+Token *Lexer::char_constant(char c) {
+	string all;
+	all.push_back(c);
+	
+	readCharSequence(&all, '\'', "Non-terminated char constant!");
+
+	char *text = new char[all.length()+1];
+	strncpy(text, all.c_str(), all.length()+1);
+	return new Token(lastPos, text, TokenType::CONSTANT);
 }
 
 Token *Lexer::identifier(char c) {
@@ -419,7 +435,9 @@ Token *Lexer::punctuator(char c) {
 		}
 		}
 
-		return new Token(current, "EOF", TokenType::END);
+		//unknown char
+		errorf(*current, "Unknown Char in the input!");
+		return new Token(lastPos, new char[2] {c,0} , TokenType::UNKNOWN);
 }
 
 list<Token*> *Lexer::lex() {
